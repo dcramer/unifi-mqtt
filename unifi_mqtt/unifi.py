@@ -47,6 +47,7 @@ class UnifiApi:
 
     async def connect(self, reconnect=False):
         self.is_closed = False
+        self.is_reconnecting = False
         await self.login(reconnect=reconnect)
         await self.listen()
 
@@ -55,6 +56,9 @@ class UnifiApi:
         self.ws.close()
 
     async def login(self, reconnect=False):
+        # clear cookies otherwise unifi throws a 404 on next login
+        self.session.cookie_jar.clear()
+
         try:
             response = await self.session.post(
                 f"{self.controller}/api/auth/login",
@@ -91,7 +95,6 @@ class UnifiApi:
             return
 
         await self._on_open()
-
         while True:
             msg = await self.ws.receive()
             if msg.type == aiohttp.WSMsgType.TEXT:
@@ -132,8 +135,6 @@ class UnifiApi:
 
         await asyncio.sleep(self.auto_reconnect_interval)
         await self.emit("ctrl.reconnect")
-        self.is_reconnecting = False
-        self.session.cookie_jar.clear()
         await self.connect(True)
 
     async def _handle_event(self, type: str, data):
