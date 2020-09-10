@@ -1,4 +1,11 @@
 import asyncio
+from unifi_mqtt.constants import (
+    UNIFI_DEFAULT_HOST,
+    UNIFI_DEFAULT_PASSWORD,
+    UNIFI_DEFAULT_PORT,
+    UNIFI_DEFAULT_USERNAME,
+    UNIFI_DEFAULT_SITE,
+)
 import aiohttp
 import logging
 
@@ -11,11 +18,11 @@ USER_AGENT = "unifi-mqtt/1.0"
 class UnifiApi:
     def __init__(
         self,
-        host: str = "unifi",
-        port: int = 443,
-        username: str = "admin",
-        password: str = "ubnt",
-        site: str = "default",
+        host: str = UNIFI_DEFAULT_HOST,
+        port: int = UNIFI_DEFAULT_PORT,
+        username: str = UNIFI_DEFAULT_USERNAME,
+        password: str = UNIFI_DEFAULT_PASSWORD,
+        site: str = UNIFI_DEFAULT_SITE,
         verify_ssl: bool = True,
     ):
         self.host = host

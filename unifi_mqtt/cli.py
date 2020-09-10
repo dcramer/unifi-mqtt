@@ -1,4 +1,11 @@
 import asyncio
+from unifi_mqtt.constants import (
+    UNIFI_DEFAULT_HOST,
+    UNIFI_DEFAULT_PASSWORD,
+    UNIFI_DEFAULT_PORT,
+    UNIFI_DEFAULT_USERNAME,
+    UNIFI_DEFAULT_SITE,
+)
 import click
 import os
 
@@ -10,11 +17,11 @@ from .unifi import UnifiApi
 
 
 @click.command()
-@click.option("--host", default="unifi")
-@click.option("--port", default=443, type=int)
-@click.option("--username", default="admin")
-@click.option("--password", default="ubnt")
-@click.option("--site", default="default")
+@click.option("--host", default=UNIFI_DEFAULT_HOST)
+@click.option("--port", default=UNIFI_DEFAULT_PORT, type=int)
+@click.option("--username", default=UNIFI_DEFAULT_USERNAME)
+@click.option("--password", default=UNIFI_DEFAULT_PASSWORD)
+@click.option("--site", default=UNIFI_DEFAULT_SITE)
 @click.option("--secure/--insecure", default=True)
 def main(host, port, username, password, site, secure):
     os.environ["PYTHONUNBUFFERED"] = "true"
