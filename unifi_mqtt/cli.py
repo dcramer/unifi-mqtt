@@ -1,4 +1,9 @@
+import logging
 import asyncio
+import os
+
+import click
+
 from unifi_mqtt.constants import (
     UNIFI_DEFAULT_HOST,
     UNIFI_DEFAULT_PASSWORD,
@@ -6,10 +11,6 @@ from unifi_mqtt.constants import (
     UNIFI_DEFAULT_USERNAME,
     UNIFI_DEFAULT_SITE,
 )
-import click
-import os
-
-import logging
 
 logging.basicConfig(level=logging.INFO)
 

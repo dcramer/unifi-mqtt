@@ -1,4 +1,7 @@
 import asyncio
+import aiohttp
+import logging
+
 from unifi_mqtt.constants import (
     UNIFI_DEFAULT_HOST,
     UNIFI_DEFAULT_PASSWORD,
@@ -6,8 +9,6 @@ from unifi_mqtt.constants import (
     UNIFI_DEFAULT_USERNAME,
     UNIFI_DEFAULT_SITE,
 )
-import aiohttp
-import logging
 
 logger = logging.getLogger("unifi_mqtt.unifi")
 
@@ -69,7 +70,6 @@ class UnifiApi:
             logger.info("auth.success")
         except aiohttp.ClientError as exc:
             logger.info("auth.failed")
-            self.session.cookie_jar.clear()
             if reconnect:
                 await self._reconnect()
         except Exception as exc:
@@ -133,6 +133,7 @@ class UnifiApi:
         await asyncio.sleep(self.auto_reconnect_interval)
         await self.emit("ctrl.reconnect")
         self.is_reconnecting = False
+        self.session.cookie_jar.clear()
         await self.connect(True)
 
     async def _handle_event(self, type: str, data):
