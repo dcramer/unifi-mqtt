@@ -1,3 +1,5 @@
+from enum import Enum
+
 import aiohttp
 import logging
 
@@ -42,8 +44,8 @@ class UnifiService:
         if self.ws:
             await self.ws.close()
 
-    async def emit(self, *args, **kwargs):
-        return await self.controller.emit(*args, **kwargs)
+    async def emit(self, event: str, payload: dict = None):
+        return await self.controller.emit(self.name, event, payload)
 
     async def listen(self):
         try:
@@ -54,7 +56,7 @@ class UnifiService:
                 compress=False,
             )
         except aiohttp.ClientError as exc:
-            await self.emit("ctrl.error", exc)
+            await self.emit(self.name, "error", exc)
             return
 
         await self._on_open()
@@ -83,14 +85,12 @@ class UnifiService:
 
     async def _on_binary_message(self, msg):
         try:
-            # await self.emit(f"{self.name}.message")
             await self.on_binary_message(msg)
         except Exception as exc:
             await self._on_error(exc)
 
     async def _on_message(self, msg):
         try:
-            # await self.emit(f"{self.name}.message")
             await self.on_message(msg)
         except Exception as exc:
             await self._on_error(exc)

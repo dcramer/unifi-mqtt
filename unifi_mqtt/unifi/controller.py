@@ -72,7 +72,7 @@ class UnifiController:
     async def login(self, reconnect=False):
         # clear cookies otherwise unifi throws a 404 on next login
         self.session.cookie_jar.clear()
-
+        await self.emit("controller", "login")
         try:
             await self.session.post(
                 f"{self.url}/api/auth/login",
@@ -99,10 +99,10 @@ class UnifiController:
     def remove_handler(self, callback):
         self.handlers.remove(callback)
 
-    async def emit(self, event: str, *args):
-        logger.info(event)
+    async def emit(self, name: str, event: str, payload: dict = None):
+        logger.debug(f"controller.emit {name}.{event}")
         for handler in self.handlers:
-            await handler(event)
+            await handler(name, event, payload)
 
     async def listen(self):
         for service in self.services:
@@ -119,15 +119,15 @@ class UnifiController:
 
     async def on_websocket_open(self, service: UnifiService):
         self.is_reconnecting = False
-        await self.emit(f"{service.name}.connect")
+        await self.emit(service.name, "connect")
 
     async def on_websocket_close(self, service: UnifiService):
-        await self.emit(f"{service.name}.close")
+        await self.emit(service.name, "close")
         await self._reconnect()
 
     async def on_websocket_error(self, service: UnifiService, exc: BaseException):
         logger.exception(str(exc))
-        await self.emit(f"{service.name}.error", exc)
+        await self.emit(service.name, "error", exc)
         await self._reconnect()
 
     async def _reconnect(self):
@@ -137,7 +137,7 @@ class UnifiController:
         self.is_reconnecting = True
 
         await asyncio.sleep(self.auto_reconnect_interval)
-        await self.emit("ctrl.reconnect")
+        await self.emit("controller", "reconnect")
         await self.connect(True)
 
     async def _ensure_logged_in(self):

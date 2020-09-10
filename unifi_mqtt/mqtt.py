@@ -1,4 +1,4 @@
-from asyncio_mqtt import Client, MqttError
+from asyncio_mqtt import Client
 
 from .constants import MQTT_DEFAULT_PORT, MQTT_DEFAULT_TOPIC, MQTT_DEFAULT_USERNAME, MQTT_DEFAULT_PASSWORD
 

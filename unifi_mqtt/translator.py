@@ -17,6 +17,7 @@ class Translator:
     def disconnect(self, controller: UnifiController):
         controller.remove_handler(self.on_emit)
 
-    async def on_emit(self, event: str, *args):
-        logger.debug("emit.receive %s", event)
-        pass
+    async def on_emit(self, name: str, event: str, payload):
+        topic = "{}/{}".format(name, event.replace(".", "/"))
+        logger.debug("mqtt.publish %s", topic)
+        await self.mqtt.publish(topic, payload)
