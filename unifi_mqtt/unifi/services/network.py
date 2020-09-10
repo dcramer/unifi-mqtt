@@ -19,5 +19,4 @@ class UnifiNetworkService(UnifiService):
             return
         if type == "events":
             key = data["key"]
-
-        await self.emit(f"{self.name}.message", type, data)
+            await self.emit(key, data)
