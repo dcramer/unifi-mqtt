@@ -57,6 +57,7 @@ class UnifiController:
         self.is_closed = False
         self.is_reconnecting = False
         self.auto_reconnect_interval = 5
+        self.handlers = []
 
     async def connect(self, reconnect=False):
         self.is_closed = False
@@ -92,8 +93,16 @@ class UnifiController:
         except Exception as exc:
             logger.exception(str(exc))
 
+    def add_handler(self, callback):
+        self.handlers.append(callback)
+
+    def remove_handler(self, callback):
+        self.handlers.remove(callback)
+
     async def emit(self, event: str, *args):
         logger.info(event)
+        for handler in self.handlers:
+            await handler(event)
 
     async def listen(self):
         for service in self.services:

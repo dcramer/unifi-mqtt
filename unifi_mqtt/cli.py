@@ -4,18 +4,20 @@ import os
 
 import click
 
-from unifi_mqtt.constants import (
+from .mqtt import Mqtt
+from .unifi.controller import UnifiController
+from .translator import Translator
+from .constants import (
     UNIFI_DEFAULT_HOST,
     UNIFI_DEFAULT_PASSWORD,
     UNIFI_DEFAULT_PORT,
     UNIFI_DEFAULT_USERNAME,
     UNIFI_DEFAULT_SITE,
-    DEFAULT_TOPIC,
+    MQTT_DEFAULT_PORT,
+    MQTT_DEFAULT_TOPIC,
 )
 
 logging.basicConfig(level=logging.INFO)
-
-from .unifi.controller import UnifiController
 
 
 def configure_logging(log_level):
@@ -37,18 +39,37 @@ def configure_logging(log_level):
 @click.option("--site", default=UNIFI_DEFAULT_SITE)
 @click.option("--secure/--insecure", default=True)
 @click.option("--service", multiple=True, default=["network"])
-@click.option("--topic", default=DEFAULT_TOPIC)
+@click.option("--mqtt-host", default="localhost")
+@click.option("--mqtt-port", default=MQTT_DEFAULT_PORT, type=int)
+@click.option("--topic", default=MQTT_DEFAULT_TOPIC)
 @click.option(
     "--log-level",
     default="info",
     type=click.Choice(["error", "warning", "info", "debug"]),
 )
-def main(host, port, username, password, site, secure, topic, service, log_level):
+def main(
+    host,
+    port,
+    username,
+    password,
+    site,
+    secure,
+    topic,
+    service,
+    log_level,
+    mqtt_host,
+    mqtt_port,
+):
     os.environ["PYTHONUNBUFFERED"] = "true"
 
     configure_logging(log_level)
 
-    unifi = UnifiController(
+    mqtt = Mqtt(
+        host=mqtt_host,
+        port=mqtt_port,
+    )
+
+    controller = UnifiController(
         host=host,
         port=port,
         username=username,
@@ -58,8 +79,12 @@ def main(host, port, username, password, site, secure, topic, service, log_level
         services=service,
     )
 
+    translator = Translator(mqtt)
+    translator.connect(controller)
+
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(unifi.connect())
+    loop.run_until_complete(mqtt.connect())
+    loop.run_until_complete(controller.connect())
 
     try:
         loop.run_forever()
