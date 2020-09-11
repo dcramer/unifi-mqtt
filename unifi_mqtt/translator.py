@@ -17,8 +17,17 @@ class Event:
     data: dict = field(default_factory=dict)
 
 
-# def format_topic(name, event):
-#     return "{}/{}".format(name, event.replace(".", "/"))
+def format_name(name):
+    return name.replace(".", "").replace(" ", "-").lower()
+
+
+def format_target(target_list):
+    targets = {t["type"]: t for t in target_list}
+    return "/".join(
+        format_name(targets[k]["display_name"])
+        for k in ("building", "floor", "door")
+        if k in targets
+    )
 
 
 def serialize_network(event, payload):
@@ -73,24 +82,17 @@ def serialize_access(event, payload):
                 },
                 "ts": source["event"]["published"],
             }
-            events = [
+            target_path = format_target(source["target"])
+            return [
                 Event(
                     f"device/{payload['device_id']}/unlock",
                     data,
-                )
+                ),
+                Event(
+                    f"target/{target_path}/unlock",
+                    data,
+                ),
             ]
-            for target in source["target"]:
-                events.append(
-                    Event(
-                        f"target/{target['id']}/unlock",
-                        {
-                            "name": target["display_name"],
-                            "type": target["type"],
-                            **data,
-                        },
-                    )
-                )
-            return events
 
 
 def serialize(name, event, payload) -> Union[Optional[Event], List[Event]]:
