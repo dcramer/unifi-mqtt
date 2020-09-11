@@ -4,7 +4,7 @@ from asyncio_mqtt import Client
 
 from .constants import (
     MQTT_DEFAULT_PORT,
-    MQTT_DEFAULT_TOPIC,
+    MQTT_DEFAULT_NAME,
     MQTT_DEFAULT_USERNAME,
     MQTT_DEFAULT_PASSWORD,
 )
@@ -20,13 +20,13 @@ class Mqtt:
         port: int = MQTT_DEFAULT_PORT,
         username: str = MQTT_DEFAULT_USERNAME,
         password: str = MQTT_DEFAULT_PASSWORD,
-        topic: str = MQTT_DEFAULT_TOPIC,
+        name: str = MQTT_DEFAULT_NAME,
     ):
         self.username = username
         self.password = password
         self.host = host
         self.port = port
-        self.topic = topic
+        self.name = name
 
         self.self = None
 
@@ -44,9 +44,10 @@ class Mqtt:
         await self.client.disconnect()
 
     async def publish(self, topic, payload):
-        logger.debug("mqtt.publish %s", topic)
+        full_topic = f"{self.name}/{topic}"
+        logger.debug("mqtt.publish %s", full_topic)
 
-        await self.client.publish(f"{self.topic}/{topic}", payload)
+        await self.client.publish(full_topic, payload)
 
     # # The callback for when the client receives a CONNACK response from the server.
     # def _on_connect(client, userdata, flags, rc):

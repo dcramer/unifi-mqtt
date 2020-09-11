@@ -15,7 +15,7 @@ from .constants import (
     UNIFI_DEFAULT_SITE,
     MQTT_DEFAULT_HOST,
     MQTT_DEFAULT_PORT,
-    MQTT_DEFAULT_TOPIC,
+    MQTT_DEFAULT_NAME,
     MQTT_DEFAULT_USERNAME,
     MQTT_DEFAULT_PASSWORD,
 )
@@ -44,7 +44,7 @@ def configure_logging(log_level):
 @click.option("--secure/--insecure", default=True)
 @click.option("--mqtt-host", default=MQTT_DEFAULT_HOST)
 @click.option("--mqtt-port", default=MQTT_DEFAULT_PORT, type=int)
-@click.option("--mqtt-topic", default=MQTT_DEFAULT_TOPIC)
+@click.option("--mqtt-name", default=MQTT_DEFAULT_NAME)
 @click.option("--mqtt-username", default=MQTT_DEFAULT_USERNAME)
 @click.option("--mqtt-password", default=MQTT_DEFAULT_PASSWORD)
 @click.option(
@@ -63,7 +63,7 @@ def main(
     log_level,
     mqtt_host,
     mqtt_port,
-    mqtt_topic,
+    mqtt_name,
     mqtt_username,
     mqtt_password,
 ):
@@ -74,7 +74,7 @@ def main(
     mqtt = Mqtt(
         host=mqtt_host,
         port=mqtt_port,
-        topic=mqtt_topic,
+        name=mqtt_name,
         username=mqtt_username,
         password=mqtt_password,
     )
