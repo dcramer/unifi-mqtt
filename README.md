@@ -25,8 +25,24 @@ Take a set of events, from any available Unifi service, and turn them into a rea
 
 Some of this will be doing via Unifi event streams, some of it may require polling information. Because it's not uniform that means this project will need to determine some payloads itself. An open question remains on whether the project should determine _all_ payloads, but for API compatibility that would certainly be valuable.
 
-Right now the approach is to take an event (`EVT_WU_Disconnected`) and translate it into an mqtt topic (`{prefix}/unifi/network/client/connected`). The payload would have to include a number of details in the upstream event, augment them with additional meta information (e.g. `WU` vs `LU` in the connected event), and coerce them into a predictable format.
+Right now the approach is to take an event (`EVT_WU_Disconnected`) and translate it into an mqtt topic (`{prefix}/network/client/connected`). The payload would have to include a number of details in the upstream event, augment them with additional meta information (e.g. `WU` vs `LU` in the connected event), and coerce them into a predictable format.
 
 Note: The above assumes limited knowledge of MQTT principles, and its possible we may want to tweak topics.
 
 Additionally we'd like to provide some form of service actions by publishing to certain streams. This still needs more thought on what kind of actions make sense, and what format is applicable.
+
+## Topics
+
+All payloads will include the following fields:
+
+- `service` - the service name (e.g. `network` or `protect`)
+- `event` - the internal event name (e.g. `EVT_WU_Disconnected`)
+- `ts` - the timestamp of the event in milliseconds
+- `raw` - the original event payload
+
+The following payloads are currently published:
+
+- `<service>/connected` - on connection established
+- `<service>/disconnected` - on connection broken
+- `network/wifi/<network>/client/<hostname>` - on connect/disconnect
+- `network/lan/<network>/client/<hostname>` - on connect/disconnect

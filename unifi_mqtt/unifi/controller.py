@@ -115,14 +115,14 @@ class UnifiController:
         results = await asyncio.gather(*listeners, return_exceptions=True)
         for result in results:
             if isinstance(result, BaseException):
-                await self.on_service_error(result)
+                await self.on_websocket_error(result)
 
     async def on_websocket_open(self, service: UnifiService):
         self.is_reconnecting = False
-        await self.emit(service.name, "connect")
+        await self.emit(service.name, "connected")
 
     async def on_websocket_close(self, service: UnifiService):
-        await self.emit(service.name, "close")
+        await self.emit(service.name, "disconnected")
         await self._reconnect()
 
     async def on_websocket_error(self, service: UnifiService, exc: BaseException):

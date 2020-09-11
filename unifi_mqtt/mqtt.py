@@ -1,12 +1,26 @@
+import logging
+
 from asyncio_mqtt import Client
 
-from .constants import MQTT_DEFAULT_PORT, MQTT_DEFAULT_TOPIC, MQTT_DEFAULT_USERNAME, MQTT_DEFAULT_PASSWORD
+from .constants import (
+    MQTT_DEFAULT_PORT,
+    MQTT_DEFAULT_TOPIC,
+    MQTT_DEFAULT_USERNAME,
+    MQTT_DEFAULT_PASSWORD,
+)
+
+
+logger = logging.getLogger("unifi_mqtt.mqtt")
 
 
 class Mqtt:
     def __init__(
-        self, host: str, port: int = MQTT_DEFAULT_PORT, username: str = MQTT_DEFAULT_USERNAME,
-            password: str = MQTT_DEFAULT_PASSWORD, topic: str = MQTT_DEFAULT_TOPIC
+        self,
+        host: str,
+        port: int = MQTT_DEFAULT_PORT,
+        username: str = MQTT_DEFAULT_USERNAME,
+        password: str = MQTT_DEFAULT_PASSWORD,
+        topic: str = MQTT_DEFAULT_TOPIC,
     ):
         self.username = username
         self.password = password
@@ -16,7 +30,12 @@ class Mqtt:
 
         self.self = None
 
-        self.client = Client(hostname=self.host, port=self.port, username=self.username, password=self.password)
+        self.client = Client(
+            hostname=self.host,
+            port=self.port,
+            username=self.username,
+            password=self.password,
+        )
 
     async def connect(self):
         await self.client.connect()
@@ -25,6 +44,8 @@ class Mqtt:
         await self.client.disconnect()
 
     async def publish(self, topic, payload):
+        logger.debug("mqtt.publish %s", topic)
+
         await self.client.publish(f"{self.topic}/{topic}", payload)
 
     # # The callback for when the client receives a CONNACK response from the server.
