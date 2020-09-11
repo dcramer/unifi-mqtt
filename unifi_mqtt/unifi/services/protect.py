@@ -16,4 +16,4 @@ class UnifiProtectService(UnifiService):
 
     async def on_binary_message(self, msg):
         # TODO: need to identify format
-        print(self.name, msg.data)
+        pass
