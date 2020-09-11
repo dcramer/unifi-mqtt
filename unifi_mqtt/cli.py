@@ -13,8 +13,11 @@ from .constants import (
     UNIFI_DEFAULT_PORT,
     UNIFI_DEFAULT_USERNAME,
     UNIFI_DEFAULT_SITE,
+    MQTT_DEFAULT_HOST,
     MQTT_DEFAULT_PORT,
     MQTT_DEFAULT_TOPIC,
+    MQTT_DEFAULT_USERNAME,
+    MQTT_DEFAULT_PASSWORD,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -32,33 +35,37 @@ def configure_logging(log_level):
 
 
 @click.command()
-@click.option("--host", default=UNIFI_DEFAULT_HOST)
-@click.option("--port", default=UNIFI_DEFAULT_PORT, type=int)
-@click.option("--username", default=UNIFI_DEFAULT_USERNAME)
-@click.option("--password", default=UNIFI_DEFAULT_PASSWORD)
-@click.option("--site", default=UNIFI_DEFAULT_SITE)
+@click.option("--unifi-host", default=UNIFI_DEFAULT_HOST)
+@click.option("--unifi-port", default=UNIFI_DEFAULT_PORT, type=int)
+@click.option("--unifi-username", default=UNIFI_DEFAULT_USERNAME)
+@click.option("--unifi-password", default=UNIFI_DEFAULT_PASSWORD)
+@click.option("--unifi-site", default=UNIFI_DEFAULT_SITE)
 @click.option("--secure/--insecure", default=True)
 @click.option("--service", multiple=True, default=["network"])
-@click.option("--mqtt-host", default="localhost")
+@click.option("--mqtt-host", default=MQTT_DEFAULT_HOST)
 @click.option("--mqtt-port", default=MQTT_DEFAULT_PORT, type=int)
-@click.option("--topic", default=MQTT_DEFAULT_TOPIC)
+@click.option("--mqtt-topic", default=MQTT_DEFAULT_TOPIC)
+@click.option("--mqtt-username", default=MQTT_DEFAULT_USERNAME)
+@click.option("--mqtt-password", default=MQTT_DEFAULT_PASSWORD)
 @click.option(
     "--log-level",
     default="info",
     type=click.Choice(["error", "warning", "info", "debug"]),
 )
 def main(
-    host,
-    port,
-    username,
-    password,
-    site,
+    unifi_host,
+    unifi_port,
+    unifi_username,
+    unifi_password,
+    unifi_site,
     secure,
-    topic,
     service,
     log_level,
     mqtt_host,
     mqtt_port,
+    mqtt_topic,
+    mqtt_username,
+    mqtt_password,
 ):
     os.environ["PYTHONUNBUFFERED"] = "true"
 
@@ -67,14 +74,17 @@ def main(
     mqtt = Mqtt(
         host=mqtt_host,
         port=mqtt_port,
+        topic=mqtt_topic,
+        username=mqtt_username,
+        password=mqtt_password,
     )
 
     controller = UnifiController(
-        host=host,
-        port=port,
-        username=username,
-        password=password,
-        site=site,
+        host=unifi_host,
+        port=unifi_port,
+        username=unifi_username,
+        password=unifi_password,
+        site=unifi_site,
         verify_ssl=secure,
         services=service,
     )

@@ -1,20 +1,24 @@
 from asyncio_mqtt import Client
 
-from .constants import MQTT_DEFAULT_PORT, MQTT_DEFAULT_TOPIC
+from .constants import MQTT_DEFAULT_PORT, MQTT_DEFAULT_TOPIC, MQTT_DEFAULT_USERNAME, MQTT_DEFAULT_PASSWORD
 
 
 class Mqtt:
     def __init__(
-        self, host: str, port: int = MQTT_DEFAULT_PORT, topic: str = MQTT_DEFAULT_TOPIC
+        self, host: str, port: int = MQTT_DEFAULT_PORT, username: str = MQTT_DEFAULT_USERNAME,
+            password: str = MQTT_DEFAULT_PASSWORD, topic: str = MQTT_DEFAULT_TOPIC
     ):
+        self.username = username
+        self.password = password
         self.host = host
         self.port = port
         self.topic = topic
 
         self.self = None
 
+        self.client = Client(hostname=self.host, port=self.port, username=self.username, password=self.password)
+
     async def connect(self):
-        self.client = Client(hostname=self.host, port=self.port)
         await self.client.connect()
 
     async def close(self):
