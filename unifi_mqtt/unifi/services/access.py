@@ -15,6 +15,6 @@ class UnifiAccessService(UnifiService):
             return
 
         if msg["event"] == "access.logs.add":
-            self.emit(msg["event"], msg)
+            await self.emit(msg["event"], msg)
         else:
             self.logger.debug("unknown-event: %s", msg["event"])
