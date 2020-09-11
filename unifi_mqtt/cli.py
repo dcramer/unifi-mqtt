@@ -40,8 +40,8 @@ def configure_logging(log_level):
 @click.option("--unifi-username", default=UNIFI_DEFAULT_USERNAME)
 @click.option("--unifi-password", default=UNIFI_DEFAULT_PASSWORD)
 @click.option("--unifi-site", default=UNIFI_DEFAULT_SITE)
+@click.option("--unifi-service", multiple=True, default=["network"])
 @click.option("--secure/--insecure", default=True)
-@click.option("--service", multiple=True, default=["network"])
 @click.option("--mqtt-host", default=MQTT_DEFAULT_HOST)
 @click.option("--mqtt-port", default=MQTT_DEFAULT_PORT, type=int)
 @click.option("--mqtt-topic", default=MQTT_DEFAULT_TOPIC)
@@ -58,8 +58,8 @@ def main(
     unifi_username,
     unifi_password,
     unifi_site,
+    unifi_service,
     secure,
-    service,
     log_level,
     mqtt_host,
     mqtt_port,
@@ -86,7 +86,7 @@ def main(
         password=unifi_password,
         site=unifi_site,
         verify_ssl=secure,
-        services=service,
+        services=unifi_service,
     )
 
     translator = Translator(mqtt)
