@@ -110,12 +110,14 @@ class UnifiController:
 
         listeners = []
         for service in self.services:
-            listeners.append(service.listen())
+            listeners.append([service, service.listen()])
 
-        results = await asyncio.gather(*listeners, return_exceptions=True)
-        for result in results:
+        results = await asyncio.gather(
+            *[x for _, x in listeners], return_exceptions=True
+        )
+        for service, result in results:
             if isinstance(result, BaseException):
-                await self.on_websocket_error(result)
+                await self.on_websocket_error(service, result)
 
     async def on_websocket_open(self, service: UnifiService):
         self.is_reconnecting = False

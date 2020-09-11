@@ -1,3 +1,5 @@
+import json
+
 from .base import UnifiService
 
 
@@ -14,7 +16,7 @@ class UnifiAccessService(UnifiService):
             self.logger.debug("unknown-event: %s", msg)
             return
 
-        if msg["event"] == "access.logs.add":
-            await self.emit(msg["event"], msg)
-        else:
-            self.logger.debug("unknown-event: %s", msg["event"])
+        if msg["event"] in ("access.logs.add", "access.capture.add"):
+            msg["data"] = json.loads(msg["data"])
+
+        await self.emit(msg["event"], msg)

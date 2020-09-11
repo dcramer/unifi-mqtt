@@ -46,3 +46,5 @@ The following payloads are currently published:
 - `<service>/disconnected` - on connection broken
 - `network/wifi/<network>/client/<hostname>` - on connect/disconnect
 - `network/lan/<network>/client/<hostname>` - on connect/disconnect
+- `access/device/<device>/unlock` - on successful/unsuccessful unlock
+- `access/target/<target>/unlock` - on successful/unsuccessful unlock

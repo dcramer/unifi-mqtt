@@ -45,7 +45,7 @@ class Mqtt:
 
     async def publish(self, topic, payload):
         full_topic = f"{self.name}/{topic}"
-        logger.debug("mqtt.publish %s", full_topic)
+        logger.info("mqtt.publish %s", full_topic)
 
         await self.client.publish(full_topic, payload)
 
