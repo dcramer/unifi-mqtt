@@ -37,6 +37,7 @@ class UnifiController:
         password: str = UNIFI_DEFAULT_PASSWORD,
         site: str = UNIFI_DEFAULT_SITE,
         verify_ssl: bool = True,
+        use_unsafe_cookie_jar: bool = False,
         services: List[str] = ["network"],
     ):
         self.host = host
@@ -51,7 +52,8 @@ class UnifiController:
         self.services = tuple(SERVICES[k](self) for k in services)
 
         self.session = aiohttp.ClientSession(
-            raise_for_status=True, headers={"User-Agent": USER_AGENT}
+            raise_for_status=True, headers={"User-Agent": USER_AGENT},
+            cookie_jar=aiohttp.CookieJar(unsafe=use_unsafe_cookie_jar)
         )
 
         self.is_closed = False

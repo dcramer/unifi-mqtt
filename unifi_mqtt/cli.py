@@ -3,6 +3,7 @@ import asyncio
 import os
 
 import click
+import netaddr
 
 from .mqtt import Mqtt
 from .unifi.controller import UnifiController
@@ -79,6 +80,15 @@ def main(
         password=mqtt_password,
     )
 
+    # enable unsafe mode for aiohttp's ClientSession CookieJar if unifi_host is IP address instead of FQDN
+    try:
+        # check if unifi_host is a valid IP address
+        netaddr.IPAddress(unifi_host)
+        use_unsafe_cookie_jar = True
+    except netaddr.AddrFormatError:
+        # a netaddr.AddrFormatError exception indicates that unifi_host is not a valid IPv4/IPv6 address
+        use_unsafe_cookie_jar = False
+
     controller = UnifiController(
         host=unifi_host,
         port=unifi_port,
@@ -86,6 +96,7 @@ def main(
         password=unifi_password,
         site=unifi_site,
         verify_ssl=secure,
+        use_unsafe_cookie_jar=use_unsafe_cookie_jar,
         services=unifi_service,
     )
 
