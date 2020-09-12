@@ -31,9 +31,12 @@ def format_target(target_list):
 
 
 def serialize_network(event, payload):
+    # use mac address instead of hostname as client_name if hostname not available for client
+    client_name = payload['hostname'] if hasattr(payload, 'hostname') else payload['user']
+
     if event == "EVT_WU_Disconnected":
         return Event(
-            f"wifi/{payload['ssid']}/client/{payload['hostname']}",
+            f"wifi/{payload['ssid']}/client/{client_name}",
             {
                 "connected": False,
                 "mac": payload["user"],
@@ -42,7 +45,7 @@ def serialize_network(event, payload):
         )
     if event == "EVT_WU_Connected":
         return Event(
-            f"wifi/{payload['ssid']}/client/{payload['hostname']}",
+            f"wifi/{payload['ssid']}/client/{client_name}",
             {
                 "connected": True,
                 "mac": payload["user"],
@@ -51,7 +54,7 @@ def serialize_network(event, payload):
         )
     if event == "EVT_LU_Connected":
         return Event(
-            f"lan/{payload['network']}/client/{payload['hostname']}",
+            f"lan/{payload['network']}/client/{client_name}",
             {
                 "connected": True,
                 "mac": payload["user"],
@@ -60,7 +63,7 @@ def serialize_network(event, payload):
         )
     if event == "EVT_LU_Disconnected":
         return Event(
-            f"lan/{payload['network']}/client/{payload['hostname']}",
+            f"lan/{payload['network']}/client/{client_name}",
             {
                 "connected": False,
                 "mac": payload["user"],
