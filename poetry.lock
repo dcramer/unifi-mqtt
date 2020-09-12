@@ -121,6 +121,14 @@ version = "0.4.3"
 
 [[package]]
 category = "main"
+description = "A network address manipulation library for Python"
+name = "netaddr"
+optional = false
+python-versions = "*"
+version = "0.8.0"
+
+[[package]]
+category = "main"
 description = "MQTT version 3.1.1 client class"
 name = "paho-mqtt"
 optional = false
@@ -183,7 +191,8 @@ idna = ">=2.0"
 multidict = ">=4.0"
 
 [metadata]
-content-hash = "de755915ebcd94ccea479658cd189e672d4bda6159ccb00d2a611aa86725b1dd"
+content-hash = "508da9fdd39f69d0240bebc56e2a8c5f42fbc167e6bd34a9bcb38b79ae17fc01"
+lock-version = "1.0"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -255,6 +264,10 @@ multidict = [
 mypy-extensions = [
     {file = "mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
+]
+netaddr = [
+    {file = "netaddr-0.8.0-py2.py3-none-any.whl", hash = "sha256:9666d0232c32d2656e5e5f8d735f58fd6c7457ce52fc21c98d45f2af78f990ac"},
+    {file = "netaddr-0.8.0.tar.gz", hash = "sha256:d6cc57c7a07b1d9d2e917aa8b36ae8ce61c35ba3fcd1b83ca31c5a0ee2b5a243"},
 ]
 paho-mqtt = [
     {file = "paho-mqtt-1.5.0.tar.gz", hash = "sha256:e3d286198baaea195c8b3bc221941d25a3ab0e1507fc1779bdb7473806394be4"},

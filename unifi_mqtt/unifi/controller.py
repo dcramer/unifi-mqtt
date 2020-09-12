@@ -124,6 +124,7 @@ class UnifiController:
         await self.emit(service.name, "connected")
 
     async def on_websocket_close(self, service: UnifiService):
+        logger.debug(f"WebSocket close code {service.ws.close_code}")
         await self.emit(service.name, "disconnected")
         await self._reconnect()
 
