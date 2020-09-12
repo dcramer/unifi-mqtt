@@ -124,6 +124,9 @@ class Translator:
             event_or_events = serialize(service_name, event_name, payload)
         except Exception as exc:
             logger.exception("serialize-error")
+            logger.debug(f"serialize-error/service_name: {service_name}")
+            logger.debug(f"serialize-error/event_name: {event_name}")
+            logger.debug(f"serialize-error/payload: {payload}")
             return
 
         if not event_or_events:
