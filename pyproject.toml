@@ -10,7 +10,6 @@ python = "^3.8"
 aiohttp = "^3.6.2"
 click = "^7.1.2"
 asyncio-mqtt = "^0.7.0"
-netaddr = "^0.8.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^20.8b1", allow-prereleases = true}
