@@ -1,6 +1,6 @@
 import logging
 import json
-import string
+import re
 from dataclasses import dataclass, field
 from time import time
 from typing import List, Optional, Union
@@ -18,8 +18,13 @@ class Event:
     data: dict = field(default_factory=dict)
 
 
+mqtt_translation_table = str.maketrans({".": "", " ": "-", "_": "-"})
+mqtt_regex_object = re.compile(r"[^a-zA-Z0-9:\-\s]+")
+
+
 def format_name(name):
-    return name.replace(".", "").replace(" ", "-").lower()
+    name = name.translate(mqtt_translation_table).lower()
+    return mqtt_regex_object.sub("-", name).rstrip("-")
 
 
 def format_target(target_list):
@@ -32,20 +37,17 @@ def format_target(target_list):
 
 
 def serialize_network(event, payload):
-    # the character set used for cleaning up MQTT topic names
-    mqtt_character_whitelist = set().union(string.ascii_letters, string.digits, string.punctuation)
-
     # use the device's MAC address instead of its hostname as client_name if a hostname is not available for that client
     if "hostname" in payload:
-        client_name = ''.join(filter(lambda x: x in mqtt_character_whitelist, payload["hostname"]))
+        client_name = format_name(payload["hostname"])
     else:
-        client_name = payload["user"]
+        client_name = format_name(payload["user"])
 
     # use the SSID as the network_name if it's a WLAN event
     if payload["subsystem"] == "wlan" and "ssid" in payload:
-        network_name = ''.join(filter(lambda x: x in mqtt_character_whitelist, payload["ssid"]))
+        network_name = format_name(payload["ssid"])
     else:
-        network_name = ''.join(filter(lambda x: x in mqtt_character_whitelist, payload["network"]))
+        network_name = format_name(payload["network"])
 
     if event == "EVT_WU_Disconnected":
         return Event(
