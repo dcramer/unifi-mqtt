@@ -1,3 +1,4 @@
+import ipaddress
 import logging
 import asyncio
 import os
@@ -79,6 +80,13 @@ def main(
         password=mqtt_password,
     )
 
+    # enable unsafe mode for aiohttp's ClientSession CookieJar if unifi_host is an IP address instead of a FQDN
+    try:
+        ipaddress.ip_address(unifi_host)  # check if unifi_host is a valid IP address
+        use_unsafe_cookie_jar = True
+    except ValueError:  # a ValueError indicates that unifi_host is not a valid IP address
+        use_unsafe_cookie_jar = False
+
     controller = UnifiController(
         host=unifi_host,
         port=unifi_port,
@@ -86,6 +94,7 @@ def main(
         password=unifi_password,
         site=unifi_site,
         verify_ssl=secure,
+        use_unsafe_cookie_jar=use_unsafe_cookie_jar,
         services=unifi_service,
     )
 

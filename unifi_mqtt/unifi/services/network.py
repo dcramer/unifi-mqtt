@@ -14,9 +14,9 @@ class UnifiNetworkService(UnifiService):
         for entry in msg["data"]:
             await self.handle_event(meta["message"], entry)
 
-    async def handle_event(self, type: str, data):
-        if type in IGNORE_EVENTS:
+    async def handle_event(self, event_type: str, data):
+        if event_type in IGNORE_EVENTS:
             return
-        if type == "events":
+        if event_type == "events":
             key = data["key"]
             await self.emit(key, data)

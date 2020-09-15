@@ -1,5 +1,6 @@
 import logging
 import json
+import re
 from dataclasses import dataclass, field
 from time import time
 from typing import List, Optional, Union
@@ -17,8 +18,13 @@ class Event:
     data: dict = field(default_factory=dict)
 
 
+mqtt_translation_table = str.maketrans({".": "", " ": "-", "_": "-"})
+mqtt_regex_object = re.compile(r"[^a-zA-Z0-9:\-\s]+")
+
+
 def format_name(name):
-    return name.replace(".", "").replace(" ", "-").lower()
+    name = name.translate(mqtt_translation_table).lower()
+    return mqtt_regex_object.sub("-", name).rstrip("-")
 
 
 def format_target(target_list):
@@ -31,9 +37,21 @@ def format_target(target_list):
 
 
 def serialize_network(event, payload):
+    # use the device's MAC address instead of its hostname as client_name if a hostname is not available for that client
+    if "hostname" in payload:
+        client_name = format_name(payload["hostname"])
+    else:
+        client_name = format_name(payload["user"])
+
+    # use the SSID as the network_name if it's a WLAN event
+    if payload["subsystem"] == "wlan" and "ssid" in payload:
+        network_name = format_name(payload["ssid"])
+    else:
+        network_name = format_name(payload["network"])
+
     if event == "EVT_WU_Disconnected":
         return Event(
-            f"wifi/{payload['ssid']}/client/{payload['hostname']}",
+            f"wifi/{network_name}/client/{client_name}",
             {
                 "connected": False,
                 "mac": payload["user"],
@@ -42,7 +60,7 @@ def serialize_network(event, payload):
         )
     if event == "EVT_WU_Connected":
         return Event(
-            f"wifi/{payload['ssid']}/client/{payload['hostname']}",
+            f"wifi/{network_name}/client/{client_name}",
             {
                 "connected": True,
                 "mac": payload["user"],
@@ -51,7 +69,7 @@ def serialize_network(event, payload):
         )
     if event == "EVT_LU_Connected":
         return Event(
-            f"lan/{payload['network']}/client/{payload['hostname']}",
+            f"lan/{network_name}/client/{client_name}",
             {
                 "connected": True,
                 "mac": payload["user"],
@@ -60,7 +78,7 @@ def serialize_network(event, payload):
         )
     if event == "EVT_LU_Disconnected":
         return Event(
-            f"lan/{payload['network']}/client/{payload['hostname']}",
+            f"lan/{network_name}/client/{client_name}",
             {
                 "connected": False,
                 "mac": payload["user"],
@@ -121,6 +139,9 @@ class Translator:
             event_or_events = serialize(service_name, event_name, payload)
         except Exception as exc:
             logger.exception("serialize-error")
+            logger.debug(f"serialize-error/service_name: {service_name}")
+            logger.debug(f"serialize-error/event_name: {event_name}")
+            logger.debug(f"serialize-error/payload: {payload}")
             return
 
         if not event_or_events:
